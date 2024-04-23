@@ -1,0 +1,23 @@
+---
+title: "Final Project"
+author: "Michael Bevilacqua, Jonah Kotzen, Jaan Selod"
+date: "2024-04-23"
+output: html_document
+bibliography: BIOL5380
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction:
+
+# Methods:
+
+# Results:
+
+# Discussion:
+
+# Author Contributions:
+
+# References:
