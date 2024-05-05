@@ -8,15 +8,42 @@ bibliography: BIOL5380
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(knitr)
+library(av)
 ```
 
 # Introduction:
 
-Fish behavior 
+Fish behavior
+
+The  Myctophidae family includes the species *Diaphus mollis*, mesopelagic fish that reach body lengths of 6.6 cm [@Froese2024]. picture?
+
+metadata: specimen_speed.csv
 
 # Methods:
 
+- dead myctophids and water tunnel
+- iPhone video recording software --> ImageJ with MTrackJ plugin --> coordinates
+
 # Results:
+```{r loadinfo, echo = F, warning = F, message = F}
+specimens <- read.csv("specimen_info.csv")
+specimens %>%
+  kable(caption = "Table 1: Specimen Information")
+```
+
+```{r vidanalysis, eval = F}
+f <- list.files(full.names = T, pattern = ".MOV")
+dir.create("images")
+for (i in f) {
+  if(dir.exists("images")) unlink("images", recursive = T)
+  av_video_images(i, destdir = "images", format = "tiff")
+  f.i <- list.files("images", full.names = T)
+  av_encode_video(f.i, gsub("MOV", "avi", basename(i)), codec = "rawvideo")
+}
+```
+
 
 # Discussion:
 
