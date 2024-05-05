@@ -45,6 +45,11 @@ for (i in f) {
 ```
 
 
+```{r loadinfo, echo = F, warning = F, message = F}
+specimens <- read.csv("specimen_info.csv")
+```
+
+
 # Discussion:
 
 # Author Contributions:
