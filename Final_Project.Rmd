@@ -3,7 +3,7 @@ title: "Final Project"
 author: "Michael Bevilacqua, Jonah Kotzen, Jaan Selod"
 date: "2024-04-23"
 output: html_document
-bibliography: BIOL5380
+bibliography: BIOL5380.bib
 ---
 
 ```{r setup, include=FALSE}
