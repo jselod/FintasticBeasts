@@ -34,6 +34,8 @@ specimens %>%
 ```
 
 ```{r vidanalysis, eval = F}
+#code used to generate avi files from iphone videos
+
 f <- list.files(full.names = T, pattern = ".MOV")
 dir.create("images")
 for (i in f) {
