@@ -15,9 +15,10 @@ library(av)
 
 # Introduction:
 
-Fish behavior
 
-The  Myctophidae family includes the species *Diaphus mollis*, mesopelagic fish that reach body lengths of 6.6 cm [@Froese2024]. picture?
+The  Myctophidae family includes the species *Diaphus mollis*, mesopelagic fish that reach body lengths of 6.6 cm [@Froese2024]. These myctopids are often called lantern fish, and can be found in Atlantic and Indian Oceans. have a high evolutionary radiation, with high variability in phenotypes. This has resulted in the Myctophidae being one of the most abundant and "most species-rich deep-sea fish groups" @Tuset2018there. In this study, we will be looking at the effect of Kármán vortices on several deceased Diaphus mollis, which vary in size. These vortices form after a constant flow of water hits an object in the water, which in a natural habitat could be a rock, or a tree, however in this circumstance, a wooden dowel is used. When the myctophid is placed in this street of vortices, fish "swimming behind cylinders adopt a distinctive, previously undescribed pattern of movement in order to hold station, which we term the Kármán gait" @Liao2003there. This study will look to analyze ...
+
+picture?
 
 metadata: specimen_speed.csv
 
