@@ -25,8 +25,8 @@ metadata: specimen_speed.csv
 
 # Methods:
 
-- dead myctophids and water tunnel
-- iPhone video recording software --> ImageJ with MTrackJ plugin --> coordinates
+In order to complete this study, our group first planned out an experimental design in order to study the phenomenon known as  Kármán gaiting within the species Diapus mollis. In order to do so, we utilized 5 dead myctophids, each varying in size and weight (between 28 mm - 53 mm, and 0.16 g - 1.477 g). These fish were then attached to a thin piece of floss, inserted into their eye cavities. They were then placed into a swim tunnel, and pulled slowly behind a wooden dowel, until they displayed the  Kármán gait movement. Each specimen was swum at two different flow rates (around ...). Video was taken of each trial with an iPhone, while the lights were turned off to ensure better video quality. This process was repeated 10 times, twice for each specimen. These videos were then taken and analyzed via ImageJ with the MTrackJ plugin, in order to map the coordinates of their movements. 
+
 
 # Results:
 ```{r loadinfo, echo = F, warning = F, message = F}
