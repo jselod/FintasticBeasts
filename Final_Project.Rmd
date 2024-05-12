@@ -132,6 +132,9 @@ analysis_results <- processed_data3 %>%
     .groups = 'drop'
   )
 
+processed_data4 <- processed_data1 %>%
+  left_join(analysis_results, by = c("Specimen" = "Specimen"))
+
 # View the results
 print(analysis_results)
 
@@ -194,6 +197,7 @@ processed_data2 <- processed_data1 %>%
   summarise(mean_y_deviation = mean(y, na.rm = TRUE),
             .groups = 'drop') # Ensures the data frame does not remain grouped
 
+processed_data2
 
 ```
 
@@ -235,9 +239,122 @@ grid.arrange(plot_frequency, plot_amplitude, plot_cycles, plot_total_time, ncol=
 
 ```
 
-### Peaks and Troughs Inspection
+
+
+### Frequency Plots
+
+```{r chunk61, include=FALSE}
+
+library(ggplot2)
+library(dplyr)
+
+# Filter data for each specific condition
+data_flow_65_length3 <- processed_data4 %>% filter(Flow.x == 65)
+data_flow_85_length3 <- processed_data4 %>% filter(Flow.x == 85)
+data_flow_65_mass3 <- processed_data4 %>% filter(Flow.x == 65)
+data_flow_85_mass3 <- processed_data4 %>% filter(Flow.x == 85)
+
+# Plot for Body Length and Frequency at Flow 65
+plotW <- ggplot(data_flow_65_length3, aes(x = Body_Length_mm, y = frequency)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = TRUE, color = "blue") +
+  labs(title = "Body Length vs. Frequency at Flow 65",
+       x = "Body Length (mm)", y = "Frequency") +
+  theme_minimal()
+
+# Plot for Mass and Frequency at Flow 65
+plotX <- ggplot(data_flow_65_mass3, aes(x = Mass_g, y = frequency)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = TRUE, color = "red") +
+  labs(title = "Mass vs. Frequency at Flow 65",
+       x = "Mass (g)", y = "Frequency") +
+  theme_minimal()
+
+# Plot for Body Length and Frequency at Flow 85
+plotY <- ggplot(data_flow_85_length3, aes(x = Body_Length_mm, y = frequency)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = TRUE, color = "blue") +
+  labs(title = "Body Length vs. Frequency at Flow 85",
+       x = "Body Length (mm)", y = "Frequency") +
+  theme_minimal()
+
+# Plot for Mass and Frequency at Flow 85
+plotZ <- ggplot(data_flow_85_mass3, aes(x = Mass_g, y = frequency)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = TRUE, color = "red") +
+  labs(title = "Mass vs. Frequency at Flow 85",
+       x = "Mass (g)", y = "Frequency") +
+  theme_minimal()
+
+
+```
+
+
+```{r chunk6.21, include=TRUE,warning=FALSE}
+# Arrange the plots in a grid
+grid.arrange(plotW, plotX, plotY, plotZ, ncol = 2)
+
+```
 
 ```{r chunk6, include=FALSE}
+
+library(ggplot2)
+library(dplyr)
+
+# Filter data for each specific condition
+data_flow_65_length2 <- processed_data4 %>% filter(Flow.x == 65)
+data_flow_85_length2 <- processed_data4 %>% filter(Flow.x == 85)
+data_flow_65_mass2 <- processed_data4 %>% filter(Flow.x == 65)
+data_flow_85_mass2 <- processed_data4 %>% filter(Flow.x == 85)
+
+# Plot for Body Length and Amplitude at Flow 65
+plotA <- ggplot(data_flow_65_length2, aes(x = Body_Length_mm, y = amplitude)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = TRUE, color = "blue") +
+  labs(title = "Body Length vs. Amplitude at Flow 65",
+       x = "Body Length (mm)", y = "amplitude") +
+  theme_minimal()
+
+# Plot for Mass and Amplitude at Flow 65
+plotB <- ggplot(data_flow_65_mass2, aes(x = Mass_g, y = amplitude)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = TRUE, color = "red") +
+  labs(title = "Mass vs. Amplitude at Flow 65",
+       x = "Mass (g)", y = "amplitude") +
+  theme_minimal()
+
+# Plot for Body Length and Amplitude at Flow 85
+plotC <- ggplot(data_flow_85_length2, aes(x = Body_Length_mm, y = amplitude)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = TRUE, color = "blue") +
+  labs(title = "Body Length vs. Amplitude at Flow 85",
+       x = "Body Length (mm)", y = "amplitude") +
+  theme_minimal()
+
+# Plot for Mass and Amplitude at Flow 85
+plotD <- ggplot(data_flow_85_mass2, aes(x = Mass_g, y = amplitude)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = TRUE, color = "red") +
+  labs(title = "Mass vs. Amplitude at Flow 85",
+       x = "Mass (g)", y = "amplitude") +
+  theme_minimal()
+
+
+```
+
+### Amplitude Plots
+
+
+```{r chunk6.2, include=TRUE,warning=FALSE}
+# Arrange the plots in a grid
+grid.arrange(plotA, plotB, plotC, plotD, ncol = 2)
+
+```
+
+
+### Mean Y Deviation Graph
+
+```{r chunk6.9, include=FALSE}
 
 library(ggplot2)
 library(dplyr)
@@ -286,7 +403,7 @@ plot4 <- ggplot(data_flow_85_mass, aes(x = Mass_g, y = mean_y_deviation)) +
 ### Combined plot for Body Length and Mass vs. Mean Y Deviation at Different Flow Speeds
 
 
-```{r chunk6.2, include=TRUE,warning=FALSE}
+```{r chunk6.23, include=TRUE,warning=FALSE}
 # Arrange the plots in a grid
 grid.arrange(plot1, plot2, plot3, plot4, ncol = 2)
 
@@ -325,9 +442,18 @@ summary(anova_length)
 anova_mass <- aov(mean_y_deviation ~ Mass_g, data = processed_data2)
 summary(anova_mass)
 
-# # Running ANOVA for flow speed
+# Running ANOVA for flow speed
 anova_flow <- aov(mean_y_deviation ~ Flow, data = processed_data2)
 summary(anova_flow)
+
+# Running ANOVA for amplitude 
+anova_amp <- aov(amplitude ~ Flow.x, data = processed_data4)
+summary(anova_amp)
+
+# Running ANOVA for frequency 
+anova_freq <- aov(frequency ~ Flow.x, data = processed_data4)
+summary(anova_freq)
+
 
 ```
 
