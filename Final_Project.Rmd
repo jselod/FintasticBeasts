@@ -12,6 +12,8 @@ library(tidyverse)
 library(knitr)
 library(av)
 library(ggplot2)
+library(gridExtra)
+
 ```
 
 # Introduction:
@@ -143,27 +145,67 @@ processed_data2 <- processed_data1 %>%
 
 ```
 
-### Combined plot for Body Length and Mass vs. Mean Y Deviation
 
-```{r chunk6, include=TRUE}
-combined_data <- processed_data2 %>%
-  gather(key = "Metric", value = "Value", Body_Length_mm, Mass_g) 
+```{r chunk6, include=FALSE}
 
-ggplot(combined_data, aes(x = Value, y = mean_y_deviation, color = as.factor(Specimen))) +
+library(ggplot2)
+library(dplyr)
+
+# Filter data for each specific condition
+data_flow_65_length <- processed_data2 %>% filter(Flow == 65)
+data_flow_85_length <- processed_data2 %>% filter(Flow == 85)
+data_flow_65_mass <- processed_data2 %>% filter(Flow == 65)
+data_flow_85_mass <- processed_data2 %>% filter(Flow == 85)
+
+# Plot for Body Length and Mean Y Deviation at Flow 65
+plot1 <- ggplot(data_flow_65_length, aes(x = Body_Length_mm, y = mean_y_deviation)) +
   geom_point() +
-  geom_smooth(method = "lm") + 
-  facet_wrap(~ Metric, scales = "free_x") +
-  labs(title = "Effect of Body Metrics on Mean Y-Coordinate Deviation",
-       x = "Metric Value", y = "Mean Y Deviation (mm)",
-       color = "Specimen") +
+  geom_smooth(method = "lm", se = TRUE, color = "blue") +
+  labs(title = "Body Length vs. Mean Y Deviation at Flow 65",
+       x = "Body Length (mm)", y = "Mean Y Deviation (mm)") +
   theme_minimal()
 
+# Plot for Mass and Mean Y Deviation at Flow 65
+plot2 <- ggplot(data_flow_65_mass, aes(x = Mass_g, y = mean_y_deviation)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = TRUE, color = "red") +
+  labs(title = "Mass vs. Mean Y Deviation at Flow 65",
+       x = "Mass (g)", y = "Mean Y Deviation (mm)") +
+  theme_minimal()
+
+# Plot for Body Length and Mean Y Deviation at Flow 85
+plot3 <- ggplot(data_flow_85_length, aes(x = Body_Length_mm, y = mean_y_deviation)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = TRUE, color = "blue") +
+  labs(title = "Body Length vs. Mean Y Deviation at Flow 85",
+       x = "Body Length (mm)", y = "Mean Y Deviation (mm)") +
+  theme_minimal()
+
+# Plot for Mass and Mean Y Deviation at Flow 85
+plot4 <- ggplot(data_flow_85_mass, aes(x = Mass_g, y = mean_y_deviation)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = TRUE, color = "red") +
+  labs(title = "Mass vs. Mean Y Deviation at Flow 85",
+       x = "Mass (g)", y = "Mean Y Deviation (mm)") +
+  theme_minimal()
+
+
+
+
+```
+
+### Combined plot for Body Length and Mass vs. Mean Y Deviation at Different Flow Speeds
+
+
+```{r chunk6.2, include=TRUE,warning=FALSE}
+# Arrange the plots in a grid
+grid.arrange(plot1, plot2, plot3, plot4, ncol = 2)
 
 ```
 
 
 ### Effect of Flow Speed on PID Amount
-```{r chunk6, include=TRUE}
+```{r chunk6.3, include=TRUE}
 ggplot(processed_data1, aes(x = Flow, y = PID, group = Flow)) +
   geom_boxplot() +
   labs(title = "Effect of Flow Speed on PID Amount",
@@ -176,12 +218,12 @@ ggplot(processed_data1, aes(x = Flow, y = PID, group = Flow)) +
 ```{r chunk6.5, include=TRUE}
 ggplot(processed_data2, aes(x = Flow, y = mean_y_deviation, group = Flow)) +
   geom_boxplot() +
-  labs(title = "Effect of Flow Speed on PID Amount",
+  labs(title = "Effect of Flow Speed on Mean Y Deviation",
        x = "Flow Speed (cm/s)", y = "Mean Y Deviation") +
   theme_minimal()
 ```
 
-
+# Statistical Analysis
 
 ```{r chunk7, include=TRUE}
 # ANOVA for Body Length
