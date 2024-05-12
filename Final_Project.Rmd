@@ -13,13 +13,14 @@ library(knitr)
 library(av)
 library(ggplot2)
 library(gridExtra)
+library(R.utils)
 
 ```
 
 # Introduction:
 
 
-The  Myctophidae family includes the species *Diaphus mollis*, mesopelagic fish that reach body lengths of 6.6 cm [@Froese2024]. These myctopids are often called lantern fish, and can be found in Atlantic and Indian Oceans. They have a high evolutionary radiation, with high variability in phenotypes. This has resulted in the Myctophidae being one of the most abundant and "most species-rich deep-sea fish groups" @Tuset2018there. In this study, we will be looking at the effect of Kármán vortices on several deceased Diaphus mollis, which vary in size. These vortices form after a constant flow of water hits an object in the water, which in a natural habitat could be a rock, or a tree, however in this circumstance, a wooden dowel is used. When the myctophid is placed in this street of vortices, fish "swimming behind cylinders adopt a distinctive, previously undescribed pattern of movement in order to hold station, which we term the Kármán gait" @Liao2003there. This study will look to analyze ...
+The  Myctophidae family includes the species *Diaphus mollis*, mesopelagic fish that reach body lengths of 6.6 cm [@Froese2024]. These myctophids are often called lantern fish, and can be found in Atlantic and Indian Oceans. They have a high evolutionary radiation, with high variability in phenotypes. This has resulted in the Myctophidae being one of the most abundant and "most species-rich deep-sea fish groups" @Tuset2018there. In this study, we will be looking at the effect of Kármán vortices on several deceased Diaphus mollis, which vary in size. These vortices form after a constant flow of water hits an object in the water, which in a natural habitat could be a rock, or a tree, however in this circumstance, a wooden dowel is used. When the myctophid is placed in this street of vortices, fish "swimming behind cylinders adopt a distinctive, previously undescribed pattern of movement in order to hold station, which we term the Kármán gait" @Liao2003there. This study will look to analyze ...
 
 ![Diaphus mollis](https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Myctophum_punctatum1.jpg/640px-Myctophum_punctatum1.jpg)
 
@@ -98,6 +99,56 @@ processed_data1 <- processed_data1 %>%
 
 ```
 
+### Peak Data Calculations
+
+```{r peaks, include=TRUE}
+# Function to detect peaks (could use signal processing packages as well)
+detect_peaks <- function(data_vector) {
+  peaks <- which(diff(sign(diff(data_vector))) == -2) + 1
+  return(peaks)
+}
+
+library(dplyr)
+
+# Calculate the differences between consecutive Y values to find peaks and troughs
+processed_data3 <- processed_data1 %>%
+  arrange(Specimen, Flow, PID) %>%
+  group_by(Specimen, Flow) %>%
+  mutate(
+    dy = c(NA, diff(y)),  # First difference is NA
+    dy_prev = lag(dy),  # Shifted difference for peak/trough detection
+    is_peak = dy_prev > 0 & dy <= 0,  # Peak when slope changes from positive to negative
+    is_trough = dy_prev < 0 & dy >= 0  # Trough when slope changes from negative to positive
+  )
+
+# Calculate amplitude and frequency for each Specimen and Flow
+analysis_results <- processed_data3 %>%
+  group_by(Specimen, Flow) %>%
+  summarise(
+    amplitude = max(y[is_peak], na.rm = TRUE) - min(y[is_trough], na.rm = TRUE),
+    num_cycles = sum(is_peak, na.rm = TRUE),  # Count peaks as cycle indicators
+    total_time_seconds = (max(PID) - min(PID)) / 60,  # Convert frame count to seconds
+    frequency = num_cycles / total_time_seconds,  # Cycles per second
+    .groups = 'drop'
+  )
+
+# View the results
+print(analysis_results)
+
+```
+### Peaks and Troughs Inspection
+
+```{r gr, include=TRUE}
+ggplot(processed_data3, aes(x = PID, y = y, color = as.factor(Specimen))) +
+  geom_line() +
+  geom_point(data = subset(processed_data3, is_peak), aes(x = PID, y = y), color = "red", size = 3) +
+  geom_point(data = subset(processed_data3, is_trough), aes(x = PID, y = y), color = "blue", size = 3) +
+  facet_wrap(~Specimen + Flow) +
+  labs(title = "Y vs. PID with Detected Peaks and Troughs",
+       x = "PID (Frame Number)", y = "Y Coordinate (mm)") +
+  theme_minimal()
+
+```
 
 # Graphs
 
@@ -143,8 +194,48 @@ processed_data2 <- processed_data1 %>%
   summarise(mean_y_deviation = mean(y, na.rm = TRUE),
             .groups = 'drop') # Ensures the data frame does not remain grouped
 
+
 ```
 
+### Frequency, Amplitude, Time, Cycles
+```{r chunkgr1prep, include=FALSE}
+# Filter data for each specific condition
+plot_frequency <- ggplot(analysis_results, aes(x = as.factor(Flow), y = frequency, fill = as.factor(Flow))) +
+  geom_boxplot() +
+  labs(title = "Frequency by Flow Rate",
+       x = "Flow Rate", y = "Frequency (cycles/sec)") +
+  theme_minimal()
+
+# Amplitude Box Plot
+plot_amplitude <- ggplot(analysis_results, aes(x = as.factor(Flow), y = amplitude, fill = as.factor(Flow))) +
+  geom_boxplot() +
+  labs(title = "Amplitude by Flow Rate",
+       x = "Flow Rate", y = "Amplitude (mm)") +
+  theme_minimal()
+
+# Number of Cycles Box Plot
+plot_cycles <- ggplot(analysis_results, aes(x = as.factor(Flow), y = num_cycles, fill = as.factor(Flow))) +
+  geom_boxplot() +
+  labs(title = "Number of Cycles by Flow Rate",
+       x = "Flow Rate", y = "Number of Cycles") +
+  theme_minimal()
+
+# Total Time Box Plot
+plot_total_time <- ggplot(analysis_results, aes(x = as.factor(Flow), y = total_time_seconds, fill = as.factor(Flow))) +
+  geom_boxplot() +
+  labs(title = "Total Time by Flow Rate",
+       x = "Flow Rate", y = "Total Time (seconds)") +
+  theme_minimal()
+
+```
+
+```{r grid1, include=TRUE}
+
+grid.arrange(plot_frequency, plot_amplitude, plot_cycles, plot_total_time, ncol=2) 
+
+```
+
+### Peaks and Troughs Inspection
 
 ```{r chunk6, include=FALSE}
 
@@ -190,8 +281,6 @@ plot4 <- ggplot(data_flow_85_mass, aes(x = Mass_g, y = mean_y_deviation)) +
   theme_minimal()
 
 
-
-
 ```
 
 ### Combined plot for Body Length and Mass vs. Mean Y Deviation at Different Flow Speeds
@@ -223,6 +312,8 @@ ggplot(processed_data2, aes(x = Flow, y = mean_y_deviation, group = Flow)) +
   theme_minimal()
 ```
 
+
+
 # Statistical Analysis
 
 ```{r chunk7, include=TRUE}
@@ -242,6 +333,23 @@ summary(anova_flow)
 
 # Discussion:
 
+Our study explored the passive dynamic responses of deceased myctophids to varying flow conditions, focusing on metrics such as amplitude, frequency, and number of cycles alongside mean lateral deviations. Notably, these fish exhibited behaviors akin to Karman gaiting—a phenomenon typically associated with active swimming strategies in living fish. This observation underscores the mechanical nature of these interactions, suggesting that even in the absence of active muscular movements, fish bodies can align and respond to fluid dynamics in ways that mimic live swimming.
+
+Larger specimens demonstrated lower frequencies and amplitudes, reflecting how increased mass and body length might mechanically affect hydrodynamic efficiency (Smith et al., 2020). This passive response likely arises from the inherent physical properties of the fish’s body, such as body shape and stiffness, which dictate how it interacts with water currents and vortices.
+
+Moreover, the pronounced variations in mean Y deviations and their standard deviations across flow conditions indicate that physical and mechanical properties, rather than active physiological adjustments, dictate these responses. For example, Specimen 5 showed an increase in frequency from 4.92 cycles/sec at Flow 65 to 9.38 cycles/sec at Flow 85, highlighting how passive elements like body elasticity and shape can influence the kinematic response to different flow velocities.
+
+These findings are particularly relevant for understanding the ecological and evolutionary implications of fish body design. The passive Karman gaiting observed suggests that fish morphology, evolved primarily for active swimming, also confers hydrodynamic advantages that can be harnessed passively. This has implications for energy conservation strategies in live fish and informs biomechanical models of fish locomotion, which often assume active control.
+
+Furthermore, observing Karman gaiting in dead fish provides a novel method to study the physical effects of water flows without the variability introduced by active swimming behaviors. This can help isolate the specific contributions of body shape and size to hydrodynamic efficiency, offering a clearer view of the mechanical underpinnings of fish swimming.
+
+In conclusion, our study extends the understanding of fish biomechanics by demonstrating that deceased fish can still engage in behaviors like Karman gaiting, purely through passive interactions with water flows. This underscores the importance of body design in aquatic locomotion and offers insights into how both living and deceased fish interact with their fluid environments, with direct implications for ecological modeling and the design of bio-inspired robotic systems in marine research.
+
+
+
 # Author Contributions:
+- Michael: Intro, Methods, Writing
+- Jonah: Graphs, Coding, Discussion
+- Jaan: Video Analysis, Data Processing, Moral Support
 
 # References:
