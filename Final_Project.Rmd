@@ -434,25 +434,33 @@ ggplot(processed_data2, aes(x = Flow, y = mean_y_deviation, group = Flow)) +
 # Statistical Analysis
 
 ```{r chunk7, include=TRUE}
-# ANOVA for Body Length
-anova_length <- aov(mean_y_deviation ~ Body_Length_mm, data = processed_data2)
-summary(anova_length)
 
-# ANOVA for Mass
-anova_mass <- aov(mean_y_deviation ~ Mass_g, data = processed_data2)
-summary(anova_mass)
-
-# Running ANOVA for flow speed
-anova_flow <- aov(mean_y_deviation ~ Flow, data = processed_data2)
-summary(anova_flow)
-
-# Running ANOVA for amplitude 
+# Running ANOVA for amplitude / flow
 anova_amp <- aov(amplitude ~ Flow.x, data = processed_data4)
 summary(anova_amp)
 
-# Running ANOVA for frequency 
+# Running ANOVA for frequency / flow
 anova_freq <- aov(frequency ~ Flow.x, data = processed_data4)
 summary(anova_freq)
+
+# Running ANOVA for amplitude / mass
+anova_amp <- aov(amplitude ~ Mass_g, data = processed_data4)
+summary(anova_amp)
+
+# Running ANOVA for frequency / mass
+anova_freq <- aov(frequency ~ Mass_g, data = processed_data4)
+summary(anova_freq)
+
+# Running ANOVA for amplitude / body length
+anova_amp <- aov(amplitude ~ Body_Length_mm, data = processed_data4)
+summary(anova_amp)
+
+# Running ANOVA for frequency / body length
+anova_freq <- aov(frequency ~ Body_Length_mm, data = processed_data4)
+summary(anova_freq)
+
+
+
 
 
 ```
